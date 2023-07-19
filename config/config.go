@@ -6,8 +6,7 @@ import (
 )
 
 type Config struct {
-	TgBotToken        string
-	MongodbConnection string
+	TgBotToken string
 }
 
 func MustLoad() Config {
@@ -17,12 +16,6 @@ func MustLoad() Config {
 		"token for access to Telegram bot",
 	)
 
-	mongodbConnection := flag.String(
-		"mongodb-connection",
-		"",
-		"connection string for MongoDB",
-	)
-
 	flag.Parse()
 
 	if *tgBotToken == "" {
@@ -30,7 +23,6 @@ func MustLoad() Config {
 	}
 
 	return Config{
-		TgBotToken:        *tgBotToken,
-		MongodbConnection: *mongodbConnection,
+		TgBotToken: *tgBotToken,
 	}
 }
