@@ -2,11 +2,11 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
 	"time"
 
 	tgClient "github.com/vcholak/messenger-bot/clients/telegram"
+	"github.com/vcholak/messenger-bot/config"
 	event_consumer "github.com/vcholak/messenger-bot/consumer/event-consumer"
 	"github.com/vcholak/messenger-bot/events/telegram"
 
@@ -23,12 +23,14 @@ const (
 
 func main() {
 
+	cfg := config.MustLoad()
+
 	ctx, cancelFunc := context.WithTimeout(context.Background(), 5*time.Second)
 
 	// storage := files.New(storagePath)
 	storage, err := sqlite.New(storagePath, cancelFunc)
 	if err != nil {
-		log.Fatal("Can't connect to SQlite storage: ", err)
+		log.Fatal("Can't connect to the storage: ", err)
 	}
 
 	if err := storage.Init(ctx); err != nil {
@@ -36,7 +38,7 @@ func main() {
 	}
 
 	eventsProcessor := telegram.New(
-		tgClient.New(tgBotHost, mustToken()),
+		tgClient.New(tgBotHost, cfg.TgBotToken),
 		storage,
 	)
 
@@ -47,20 +49,4 @@ func main() {
 	if err := consumer.Start(); err != nil {
 		log.Fatal("Bot service is stopped", err)
 	}
-}
-
-func mustToken() string {
-	token := flag.String(
-		"tg-bot-token",
-		"",
-		"token for access to Telegram bot",
-	)
-
-	flag.Parse()
-
-	if *token == "" {
-		log.Fatal("Telegram token is not specified")
-	}
-
-	return *token
 }
