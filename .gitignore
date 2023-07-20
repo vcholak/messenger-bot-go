@@ -1,4 +1,5 @@
 app.env
+messenger-bot
 
 # Local file storage
 .file-storage
