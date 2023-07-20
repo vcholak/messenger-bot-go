@@ -27,6 +27,7 @@ var (
 	ErrUnknownMetaType  = errors.New("unknown meta type")
 )
 
+// New creates a new EventProcessor.
 func New(client *telegram.Client, storage storage.Storage) *EventProcessor {
 	return &EventProcessor{
 		tg:      client,
@@ -34,6 +35,7 @@ func New(client *telegram.Client, storage storage.Storage) *EventProcessor {
 	}
 }
 
+// Fetch retrieves incoming events.
 func (p *EventProcessor) Fetch(ctx context.Context, limit int) ([]events.Event, error) {
 	updates, err := p.tg.Updates(ctx, p.offset, limit)
 	if err != nil {
@@ -55,6 +57,7 @@ func (p *EventProcessor) Fetch(ctx context.Context, limit int) ([]events.Event, 
 	return res, nil
 }
 
+// Process processes an event.
 func (p *EventProcessor) Process(ctx context.Context, event events.Event) error {
 	switch event.Type {
 	case events.Message:

@@ -1,2 +1,5 @@
 # Local file storage
 .file-storage
+
+# Local SQLite storage
+.sqlite

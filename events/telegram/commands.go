@@ -28,11 +28,11 @@ func (p *EventProcessor) doCmd(ctx context.Context, text string, chatID int, fir
 
 	switch text {
 	case RndCmd:
-		return p.sendRandom(ctx, chatID, firstName)
+		return p.pickRandom(ctx, chatID, firstName)
 	case HelpCmd:
-		return p.sendHelp(ctx, chatID)
+		return p.showHelp(ctx, chatID)
 	case StartCmd:
-		return p.sendHello(ctx, chatID)
+		return p.showHello(ctx, chatID)
 	default:
 		return p.tg.SendMessage(ctx, chatID, msgUnknownCommand)
 	}
@@ -65,7 +65,7 @@ func (p *EventProcessor) savePage(ctx context.Context, chatID int, pageURL strin
 	return nil
 }
 
-func (p *EventProcessor) sendRandom(ctx context.Context, chatID int, firstName string) (err error) {
+func (p *EventProcessor) pickRandom(ctx context.Context, chatID int, firstName string) (err error) {
 	defer func() { err = errp.WrapIfErr("can't do command: can't send random", err) }()
 
 	page, err := p.storage.PickRandom(ctx, firstName)
@@ -83,11 +83,11 @@ func (p *EventProcessor) sendRandom(ctx context.Context, chatID int, firstName s
 	return p.storage.Remove(ctx, page)
 }
 
-func (p *EventProcessor) sendHelp(ctx context.Context, chatID int) error {
+func (p *EventProcessor) showHelp(ctx context.Context, chatID int) error {
 	return p.tg.SendMessage(ctx, chatID, msgHelp)
 }
 
-func (p *EventProcessor) sendHello(ctx context.Context, chatID int) error {
+func (p *EventProcessor) showHello(ctx context.Context, chatID int) error {
 	return p.tg.SendMessage(ctx, chatID, msgHello)
 }
 

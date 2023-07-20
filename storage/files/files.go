@@ -15,18 +15,19 @@ import (
 	"github.com/vcholak/messenger-bot/storage"
 )
 
-// File storage
-type Storage struct {
+type FileStorage struct {
 	basePath string
 }
 
 const defaultPerm = 0774
 
-func New(basePath string) Storage {
-	return Storage{basePath: basePath}
+// New creates a new FileStorage.
+func New(basePath string) FileStorage {
+	return FileStorage{basePath: basePath}
 }
 
-func (s Storage) Save(_ context.Context, page *storage.Page) (err error) {
+// Save saves a page to the storage.
+func (s FileStorage) Save(_ context.Context, page *storage.Page) (err error) {
 	defer func() { err = errp.WrapIfErr("can't save page", err) }()
 
 	fPath := filepath.Join(s.basePath, page.FirstName)
@@ -55,7 +56,8 @@ func (s Storage) Save(_ context.Context, page *storage.Page) (err error) {
 	return nil
 }
 
-func (s Storage) PickRandom(_ context.Context, userName string) (page *storage.Page, err error) {
+// PickRandom picks a random page from the storage.
+func (s FileStorage) PickRandom(_ context.Context, userName string) (page *storage.Page, err error) {
 	defer func() { err = errp.WrapIfErr("can't pick random page", err) }()
 
 	path := filepath.Join(s.basePath, userName)
@@ -78,7 +80,8 @@ func (s Storage) PickRandom(_ context.Context, userName string) (page *storage.P
 	return s.decodePage(filepath.Join(path, file.Name()))
 }
 
-func (s Storage) Remove(_ context.Context, p *storage.Page) error {
+// Remove removes a page from the storage.
+func (s FileStorage) Remove(_ context.Context, p *storage.Page) error {
 	fileName, err := fileName(p)
 	if err != nil {
 		return errp.Wrap("can't remove page", err)
@@ -95,7 +98,8 @@ func (s Storage) Remove(_ context.Context, p *storage.Page) error {
 	return nil
 }
 
-func (s Storage) IsExists(_ context.Context, p *storage.Page) (bool, error) {
+// IsExists checks if a page exists in the storage.
+func (s FileStorage) IsExists(_ context.Context, p *storage.Page) (bool, error) {
 	fileName, err := fileName(p)
 	if err != nil {
 		return false, errp.Wrap("can't check if page exists", err)
@@ -115,7 +119,7 @@ func (s Storage) IsExists(_ context.Context, p *storage.Page) (bool, error) {
 	return true, nil
 }
 
-func (s Storage) decodePage(filePath string) (*storage.Page, error) {
+func (s FileStorage) decodePage(filePath string) (*storage.Page, error) {
 	f, err := os.Open(filePath)
 	if err != nil {
 		return nil, errp.Wrap("can't decode page", err)
