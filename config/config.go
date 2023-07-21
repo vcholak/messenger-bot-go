@@ -7,9 +7,11 @@ import (
 )
 
 type Config struct {
-	TgBotToken string `mapstructure:"TG_BOT_TOKEN"`
+	TgBotToken        string `mapstructure:"TG_BOT_TOKEN"`
+	MongodbConnection string `mapstructure:"MONGO_DB_CONNECTION"`
 }
 
+// MustLoad reads config from ./app.env file.
 func MustLoad() (cfg *Config) {
 	viper.AddConfigPath(".")
 	viper.SetConfigName("app")

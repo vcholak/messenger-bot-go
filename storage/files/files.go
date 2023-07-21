@@ -57,10 +57,10 @@ func (s FileStorage) Save(_ context.Context, page *storage.Page) (err error) {
 }
 
 // PickRandom picks a random page from the storage.
-func (s FileStorage) PickRandom(_ context.Context, userName string) (page *storage.Page, err error) {
+func (s FileStorage) PickRandom(f_ context.Context, firstName string) (page *storage.Page, err error) {
 	defer func() { err = errp.WrapIfErr("can't pick random page", err) }()
 
-	path := filepath.Join(s.basePath, userName)
+	path := filepath.Join(s.basePath, firstName)
 	log.Printf("Trying to pick up a random page from the path: %s", path)
 
 	files, err := os.ReadDir(path)

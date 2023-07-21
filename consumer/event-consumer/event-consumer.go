@@ -22,24 +22,21 @@ func New(fetcher events.Fetcher, processor events.Processor, batchSize int) Cons
 	}
 }
 
-func (c Consumer) Start() error {
+func (c Consumer) Start(ctx context.Context) error {
 	for {
-		gotEvents, err := c.fetcher.Fetch(context.Background(), c.batchSize)
+		events, err := c.fetcher.Fetch(ctx, c.batchSize)
 		if err != nil {
 			log.Printf("[ERR] consumer: %s", err.Error())
-
 			continue
 		}
 
-		if len(gotEvents) == 0 {
+		if len(events) == 0 {
 			time.Sleep(1 * time.Second)
-
 			continue
 		}
 
-		if err := c.handleEvents(context.Background(), gotEvents); err != nil {
+		if err := c.handleEvents(ctx, events); err != nil {
 			log.Print(err)
-
 			continue
 		}
 	}
@@ -51,10 +48,8 @@ func (c *Consumer) handleEvents(ctx context.Context, events []events.Event) erro
 
 		if err := c.processor.Process(ctx, event); err != nil {
 			log.Printf("can't handle event: %s", err.Error())
-
 			continue
 		}
 	}
-
 	return nil
 }

@@ -11,22 +11,22 @@ import (
 )
 
 type SqliteStorage struct {
-	db         *sql.DB
-	cancelFunc context.CancelFunc //TODO use cancelFunc
+	db *sql.DB
 }
 
 // New creates a new SQLite storage.
-func New(path string, cancelFunc context.CancelFunc) (*SqliteStorage, error) {
-	db, err := sql.Open("sqlite3", path)
+func New(path string) (*SqliteStorage, error) {
+
+	sqlite, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("can't open database: %w", err)
 	}
 
-	if err := db.Ping(); err != nil {
+	if err := sqlite.Ping(); err != nil {
 		return nil, fmt.Errorf("can't connect to database: %w", err)
 	}
-
-	return &SqliteStorage{db: db, cancelFunc: cancelFunc}, nil
+	storage := &SqliteStorage{db: sqlite}
+	return storage, nil
 }
 
 // Save saves a page to the storage.
@@ -36,7 +36,6 @@ func (s *SqliteStorage) Save(ctx context.Context, p *storage.Page) error {
 	if _, err := s.db.ExecContext(ctx, q, p.URL, p.FirstName); err != nil {
 		return fmt.Errorf("can't save page: %w", err)
 	}
-
 	return nil
 }
 
@@ -66,7 +65,6 @@ func (s *SqliteStorage) Remove(ctx context.Context, page *storage.Page) error {
 	if _, err := s.db.ExecContext(ctx, q, page.URL, page.FirstName); err != nil {
 		return fmt.Errorf("can't remove page: %w", err)
 	}
-
 	return nil
 }
 
@@ -79,7 +77,6 @@ func (s *SqliteStorage) IsExists(ctx context.Context, page *storage.Page) (bool,
 	if err := s.db.QueryRowContext(ctx, q, page.URL, page.FirstName).Scan(&count); err != nil {
 		return false, fmt.Errorf("can't check if page exists: %w", err)
 	}
-
 	return count > 0, nil
 }
 
@@ -91,6 +88,5 @@ func (s *SqliteStorage) Init(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("can't create 'pages' table: %w", err)
 	}
-
 	return nil
 }
